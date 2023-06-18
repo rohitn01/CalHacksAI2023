@@ -1,7 +1,7 @@
 import openai
 import json
 
-openai.api_key = "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"
+openai.api_key = "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"
 
 def chatGPT(prompt, model_engine="text-davinci-003", max_tokens = 1024):
   completion = openai.Completion.create(
@@ -32,7 +32,7 @@ def get_question(class_name, topic, num_q):
     '''
   return (question_prompt + "\n" + tone_prompt, formatting_prompt)
 
-def get_answer(R, answers):
+def get_answer(Q, answers):
   intro_prompt = "Given that you just asked the user these questions: "
   answer_prompt = "And the user responds to each question according to the following:"
   for i, ans in enumerate(answers):
@@ -46,14 +46,14 @@ def get_answer(R, answers):
   format_prompt = '''Return the response in the following JSON format (only return JSON and do not put any plain text in the response): 
   {"answers": [
     {
-      "rating": <put the correctness rating to the first question here>
+      "rating": <put the correctness rating to the first question here>,
       "explanation": <put the response to the first question here>
     },
     {
-      "rating": <put the correctness rating to the second question here>
+      "rating": <put the correctness rating to the second question here>,
       "explanation": <put the response to the second question here>
-    },
+    }
   ]
   }'''
-  prompt = intro_prompt + '\n"' + R + '"\n' + answer_prompt + "\n" + generate_prompt + '\n' + tone_prompt + '\n' + format_prompt
+  prompt = intro_prompt + '\n"' + Q + '"\n' + answer_prompt + "\n" + generate_prompt + '\n' + tone_prompt + '\n' + format_prompt
   return prompt

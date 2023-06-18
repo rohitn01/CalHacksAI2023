@@ -52,7 +52,7 @@ def get_response():
     global questions
     global answers
     global curr_question_response
-    global R
+    global Q
     global gpt_quiz_feedback
 
     user_message = request.form['user_message']
@@ -79,15 +79,15 @@ def get_response():
         if(curr_question_response <= len(questions)):
             prompt_response = questions[curr_question_response - 1]
         else:
-            gpt_chat = get_answer(R, answers)
+            gpt_chat = get_answer(Q, answers)
             response_json = chatGPT(gpt_chat)
-            print("afhbjafja", response_json)
+            print(response_json)
             response = json.loads(response_json)
-            gpt_quiz_feedback = response["answers"]
-            #prompt_response = gpt_quiz_feedback
-            prompt_response = "Provide feedback"
-
-
+            prompt_response = ""
+            for i, res in enumerate(response["answers"]):
+                prompt_response += "Question #" + str(i) + "\n"
+                prompt_response += "Rating" + res["rating"] + "\n"
+                prompt_response += "Explanation" + res["explanation"] + "\n"
 
     inital_prompts_filled += 1
     return {'response': prompt_response}
