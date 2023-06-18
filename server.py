@@ -8,7 +8,7 @@ import json
 
 
 # CHANGE WHEN PRESENTING FOR UPLOAD FOLDER
-UPLOAD_FOLDER = 'C:\Users\cools\CalHacksAI2023/pdf_uploads'
+UPLOAD_FOLDER = str(os.getcwd()) + '/pdf_uploads'
 ALLOWED_EXTENSIONS = {'pdf'}
 NUM_QUESTIONS_ASKED = 5
 
@@ -33,17 +33,21 @@ def allowed_file(filename):
     return '.' in filename and \
            filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
+@app.route('/homehandler', methods=['GET', 'POST'])
+def home_handler():
+    return redirect(url_for('test', request=request))
+
 @app.route('/generate-reviews', methods=['GET', 'POST'])
 def handle_human_answers():
        questions = request.form['questions']
        answers = request.form['answers']
 
-       answers = escape(request.form['user_message'])
        gpt_chat = get_answer(questions, answers)
        response_json = chatGPT(gpt_chat)
        print("afhbjafja", response_json)
        response = json.loads(response_json)
        return response
+       #redirect(url_for('home_handler', request=response))
 
        '''
        gpt_quiz_feedback = response["answers"]
@@ -51,21 +55,35 @@ def handle_human_answers():
        prompt_response = "Provide feedback"
        '''
 
-@app.route('/generate-questions', methods=['GET', 'POST'])
-def home_handler():
+@app.route('/generate-questions/<request>', methods=['POST', 'GET'])
+def test(request):
+    print("Workig sg")
+    ex = [
+    "What is the smallest unit of life?",
+    "What processes do cells carry out?",
+    "What are cells made of?",
+    "How do cells work together to make life possible?",
+    "What are the different types of cells?"
+  ]
+    return render_template("ask-users.html", questions=ex)
+
+'''
+@app.route('/generate-questions/<request>', methods=['GET', 'POST'])
+def generate_questions(request):
     global user_topic
     global user_class
     global NUM_QUESTIONS_ASKED
     global R
     global Q
     if request.method == 'POST':
-        user_topic = request.files['topic']
+        user_topic = request.form['topic']
 
         if 'file' not in request.files:
             flash('No file part')
             return redirect(request.url)
         
         file = request.files['file']
+
         if file.filename == '':
             flash('No selected file')
             return redirect(request.url)
@@ -76,27 +94,19 @@ def home_handler():
             #return redirect(url_for('download_file', name=filename))
         
 
-        '''
-        Embedding logic with FeatureForm must be connected
-        '''
+        
+        #Embedding logic with FeatureForm must be connected
+        
         user_class = "Default Class"
         
         Q, R = get_question(user_class, user_topic, NUM_QUESTIONS_ASKED)
         response_json = chatGPT(Q + R)
         print(response_json)
         response = json.loads(response_json)
-        return response
-        
-        
-        return '''
-    <!doctype html>
-    <title>Upload new File</title>
-    <h1>Upload new File</h1>
-    <form method=post enctype=multipart/form-data>
-      <input type=file name=file>
-      <input type=submit value=Upload>
-    </form>
-    '''
+        questions = response["questions"]
+        return render_template('ask-users.html', questions=questions)
+'''
+
 
 '''
 @app.route('/get_response', methods=['POST'])

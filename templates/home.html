@@ -117,12 +117,13 @@
         formData.append("file", file);
         formData.append("topic", topic);
 
-        fetch("/home", {
+        fetch("/homehandler", {
             method: "POST",
             body: formData
         })
         .then(response => {
-            console.log("Response:", response)
+                console.log("Response:", response)
+
         })
         .catch(error => {
             console.error("Error:", error);
