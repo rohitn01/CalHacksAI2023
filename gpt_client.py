@@ -1,6 +1,8 @@
 import openai
 import json
 
+openai.api_key = "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"
+
 def chatGPT(prompt, model_engine="text-davinci-003", max_tokens = 1024):
   completion = openai.Completion.create(
       engine=model_engine,
@@ -18,7 +20,7 @@ def get_question(class_name, topic, num_q):
   "engage with me in constructive discussion and exmplain in simple and understandable terms what " + topic +\
   " is in two sentences, and generate " + str(num_q) + " short answer question" + ("s" if num_q > 1 else "") + " to test my understanding."
   tone_prompt = "Use a friendly tone and stimulate my intellectual curiosity."
-  formatting_prompt = '''\n
+  formatting_prompt = '''
   Return the response in the following JSON format (only return JSON and do not put any plain text in the response): 
     {
       "summary": <the summary>,
