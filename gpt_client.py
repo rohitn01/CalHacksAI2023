@@ -1,7 +1,7 @@
 import openai
 import json
 
-openai.api_key = "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"
+openai.api_key = "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"
 
 def chatGPT(prompt, model_engine="text-davinci-003", max_tokens = 1024):
   completion = openai.Completion.create(

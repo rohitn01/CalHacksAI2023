@@ -3,6 +3,7 @@ from http.client import responses
 from flask import Flask, flash, request, redirect, url_for, render_template
 from werkzeug.utils import secure_filename
 from gpt_client import chatGPT, get_question, get_answer
+from markupsafe import escape
 import json
 
 
@@ -28,10 +29,13 @@ def index():
 @app.route('/update_chat', methods=['POST'])
 def update_chat():
     global gpt_quiz_feedback
+    global answers
+    global questions
     chat_data = request.json.get('chatData')  
+    print("Lengeth chat data:", len(chat_data))
     updated_chat_data = []
-    new_answers = [chat_data[i]  for i in range(len(chat_data) + 1 - (2 * len(answers)), len(chat_data) - 1, 2)]
-    new_questions = [chat_data[i] for i in range(len(chat_data) - (2 * len(questions)), len(chat_data) - 1, 2)]
+    new_answers = [chat_data[i]  for i in range(len(chat_data) + 1 - (2 * len(answers)), len(chat_data), 2)]
+    new_questions = [chat_data[i] for i in range(len(chat_data) - (2 * len(questions)), len(chat_data), 2)]
     for ques in range(questions):
         updated_chat_data.append(new_questions[ques])
         updated_chat_data.append(new_answers[ques])
@@ -53,9 +57,10 @@ def get_response():
     global answers
     global curr_question_response
     global R
+    global Q
     global gpt_quiz_feedback
 
-    user_message = request.form['user_message']
+    user_message = escape(request.form['user_message'])
     if inital_prompts_filled == 0:
         prompt_response = "Which class?"
     elif inital_prompts_filled == 1:
@@ -79,7 +84,7 @@ def get_response():
         if(curr_question_response <= len(questions)):
             prompt_response = questions[curr_question_response - 1]
         else:
-            gpt_chat = get_answer(R, answers)
+            gpt_chat = get_answer(Q, answers)
             response_json = chatGPT(gpt_chat)
             print("afhbjafja", response_json)
             response = json.loads(response_json)
