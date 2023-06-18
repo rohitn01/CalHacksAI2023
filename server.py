@@ -33,10 +33,6 @@ def allowed_file(filename):
     return '.' in filename and \
            filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
-@app.route('/homehandler', methods=['GET', 'POST'])
-def home_handler():
-    return redirect(url_for('test', request=request))
-
 @app.route('/generate-reviews', methods=['GET', 'POST'])
 def handle_human_answers():
        questions = request.form['questions']
@@ -46,30 +42,11 @@ def handle_human_answers():
        response_json = chatGPT(gpt_chat)
        print("afhbjafja", response_json)
        response = json.loads(response_json)
-       return response
-       #redirect(url_for('home_handler', request=response))
+       
+       return render_template("return-results.html", questions=questions, answers=answers, gpt_reviews=response["answers"], zip=zip)
 
-       '''
-       gpt_quiz_feedback = response["answers"]
-       #prompt_response = gpt_quiz_feedback
-       prompt_response = "Provide feedback"
-       '''
-
-@app.route('/generate-questions/<request>', methods=['POST', 'GET'])
-def test(request):
-    print("Workig sg")
-    ex = [
-    "What is the smallest unit of life?",
-    "What processes do cells carry out?",
-    "What are cells made of?",
-    "How do cells work together to make life possible?",
-    "What are the different types of cells?"
-  ]
-    return render_template("ask-users.html", questions=ex)
-
-'''
-@app.route('/generate-questions/<request>', methods=['GET', 'POST'])
-def generate_questions(request):
+@app.route('/generate-questions', methods=['GET', 'POST'])
+def generate_questions():
     global user_topic
     global user_class
     global NUM_QUESTIONS_ASKED
@@ -105,6 +82,19 @@ def generate_questions(request):
         response = json.loads(response_json)
         questions = response["questions"]
         return render_template('ask-users.html', questions=questions)
+
+'''
+@app.route('/generate-questions/<request>', methods=['POST', 'GET'])
+def test(request):
+    print("Workig sg")
+    ex = [
+    "What is the smallest unit of life?",
+    "What processes do cells carry out?",
+    "What are cells made of?",
+    "How do cells work together to make life possible?",
+    "What are the different types of cells?"
+  ]
+    return render_template("ask-users.html", questions=ex)
 '''
 
 

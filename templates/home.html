@@ -117,7 +117,7 @@
         formData.append("file", file);
         formData.append("topic", topic);
 
-        fetch("/homehandler", {
+        fetch("/generate-questions", {
             method: "POST",
             body: formData
         })

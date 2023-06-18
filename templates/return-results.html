@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Stylish Template</title>
+  <style>
+    /* Add your custom CSS styles here */
+    body {
+      font-family: Arial, sans-serif;
+      margin: 20px;
+    }
+    .question {
+      margin-bottom: 20px;
+    }
+    .question-name {
+      font-weight: bold;
+      margin-bottom: 10px;
+    }
+    .answer {
+      margin-bottom: 10px;
+    }
+    .review {
+      font-style: italic;
+    }
+    .rating {
+      font-weight: bold;
+      color: #FF9900;
+    }
+    .explanation {
+      margin-top: 5px;
+    }
+  </style>
+</head>
+<body>
+  <h1>Questions and Reviews</h1>
+  {% for question, answer, review in zip(questions, answers, gpt_reviews) %}
+    <div class="question">
+      <p class="question-name">{{ question }}</p>
+      <p class="answer">User Inputted Answer: {{ answer }}</p>
+      <div class="review">
+        <p class="rating">Answer Rating: {{ review["rating"] }}</p>
+        <p class="explanation">Study Buddy's Explanation: {{ review["explanation"] }}</p>
+      </div>
+    </div>
+  {% endfor %}
+</body>
+</html>
