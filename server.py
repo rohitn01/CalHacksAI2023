@@ -23,8 +23,7 @@ gpt_quiz_feedback = None
 
 @app.route('/')
 def index():
-    return render_template('index.html')
-
+    return render_template('home.html')
 
 @app.route('/update_chat', methods=['POST'])
 def update_chat():
@@ -101,9 +100,12 @@ def allowed_file(filename):
     return '.' in filename and \
            filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
-@app.route('/upload', methods=['GET', 'POST'])
-def upload_file():
+@app.route('/home', methods=['GET', 'POST'])
+def home_handler():
+    global user_topic
     if request.method == 'POST':
+        user_topic = request.files['topic']
+
         if 'file' not in request.files:
             flash('No file part')
             return redirect(request.url)

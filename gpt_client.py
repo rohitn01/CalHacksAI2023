@@ -52,7 +52,7 @@ def get_answer(R, answers):
     {
       "rating": <put the correctness rating to the second question here>
       "explanation": <put the response to the second question here>
-    },
+    }
   ]
   }'''
   prompt = intro_prompt + '\n"' + R + '"\n' + answer_prompt + "\n" + generate_prompt + '\n' + tone_prompt + '\n' + format_prompt
