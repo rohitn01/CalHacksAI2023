@@ -7,10 +7,14 @@ from markupsafe import escape
 import json
 
 
-UPLOAD_FOLDER = './pdf_uploads'
+# CHANGE WHEN PRESENTING FOR UPLOAD FOLDER
+UPLOAD_FOLDER = 'C:\Users\cools\CalHacksAI2023/pdf_uploads'
 ALLOWED_EXTENSIONS = {'pdf'}
+NUM_QUESTIONS_ASKED = 5
 
 app = Flask(__name__)
+app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+
 inital_prompts_filled = 0
 user_class = None
 user_topic = None
@@ -25,27 +29,76 @@ gpt_quiz_feedback = None
 def index():
     return render_template('home.html')
 
-@app.route('/update_chat', methods=['POST'])
-def update_chat():
-    global gpt_quiz_feedback
-    global answers
-    global questions
-    chat_data = request.json.get('chatData')  
-    print("Lengeth chat data:", len(chat_data))
-    updated_chat_data = []
-    new_answers = [chat_data[i]  for i in range(len(chat_data) + 1 - (2 * len(answers)), len(chat_data), 2)]
-    new_questions = [chat_data[i] for i in range(len(chat_data) - (2 * len(questions)), len(chat_data), 2)]
-    for ques in range(questions):
-        updated_chat_data.append(new_questions[ques])
-        updated_chat_data.append(new_answers[ques])
-        updated_chat_data.append(gpt_quiz_feedback[ques]["rating"])
-        updated_chat_data.append(gpt_quiz_feedback[ques]["explanation"])
+def allowed_file(filename):
+    return '.' in filename and \
+           filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
-    chat_data = chat_data[0:len(chat_data) - (2 * len(answers))].extend(updated_chat_data)
-    
-    return {'status': 'success', 'chatData': chat_data}
+@app.route('/generate-reviews', methods=['GET', 'POST'])
+def handle_human_answers():
+       questions = request.form['questions']
+       answers = request.form['answers']
 
+       answers = escape(request.form['user_message'])
+       gpt_chat = get_answer(questions, answers)
+       response_json = chatGPT(gpt_chat)
+       print("afhbjafja", response_json)
+       response = json.loads(response_json)
+       return response
 
+       '''
+       gpt_quiz_feedback = response["answers"]
+       #prompt_response = gpt_quiz_feedback
+       prompt_response = "Provide feedback"
+       '''
+
+@app.route('/generate-questions', methods=['GET', 'POST'])
+def home_handler():
+    global user_topic
+    global user_class
+    global NUM_QUESTIONS_ASKED
+    global R
+    global Q
+    if request.method == 'POST':
+        user_topic = request.files['topic']
+
+        if 'file' not in request.files:
+            flash('No file part')
+            return redirect(request.url)
+        
+        file = request.files['file']
+        if file.filename == '':
+            flash('No selected file')
+            return redirect(request.url)
+        
+        if file and allowed_file(file.filename):
+            filename = secure_filename(file.filename)
+            file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+            #return redirect(url_for('download_file', name=filename))
+        
+
+        '''
+        Embedding logic with FeatureForm must be connected
+        '''
+        user_class = "Default Class"
+        
+        Q, R = get_question(user_class, user_topic, NUM_QUESTIONS_ASKED)
+        response_json = chatGPT(Q + R)
+        print(response_json)
+        response = json.loads(response_json)
+        return response
+        
+        
+        return '''
+    <!doctype html>
+    <title>Upload new File</title>
+    <h1>Upload new File</h1>
+    <form method=post enctype=multipart/form-data>
+      <input type=file name=file>
+      <input type=submit value=Upload>
+    </form>
+    '''
+
+'''
 @app.route('/get_response', methods=['POST'])
 def get_response():
     global inital_prompts_filled
@@ -95,37 +148,29 @@ def get_response():
 
     inital_prompts_filled += 1
     return {'response': prompt_response}
+'''
 
-def allowed_file(filename):
-    return '.' in filename and \
-           filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+'''
+@app.route('/update_chat', methods=['POST'])
+def update_chat():
+    global gpt_quiz_feedback
+    global answers
+    global questions
+    chat_data = request.json.get('chatData')  
+    print("Lengeth chat data:", len(chat_data))
+    updated_chat_data = []
+    new_answers = [chat_data[i]  for i in range(len(chat_data) + 1 - (2 * len(answers)), len(chat_data), 2)]
+    new_questions = [chat_data[i] for i in range(len(chat_data) - (2 * len(questions)), len(chat_data), 2)]
+    for ques in range(questions):
+        updated_chat_data.append(new_questions[ques])
+        updated_chat_data.append(new_answers[ques])
+        updated_chat_data.append(gpt_quiz_feedback[ques]["rating"])
+        updated_chat_data.append(gpt_quiz_feedback[ques]["explanation"])
 
-@app.route('/home', methods=['GET', 'POST'])
-def home_handler():
-    global user_topic
-    if request.method == 'POST':
-        user_topic = request.files['topic']
-
-        if 'file' not in request.files:
-            flash('No file part')
-            return redirect(request.url)
-        file = request.files['file']
-        if file.filename == '':
-            flash('No selected file')
-            return redirect(request.url)
-        if file and allowed_file(file.filename):
-            filename = secure_filename(file.filename)
-            file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
-            return redirect(url_for('download_file', name=filename))
-        return '''
-    <!doctype html>
-    <title>Upload new File</title>
-    <h1>Upload new File</h1>
-    <form method=post enctype=multipart/form-data>
-      <input type=file name=file>
-      <input type=submit value=Upload>
-    </form>
-    '''
+    chat_data = chat_data[0:len(chat_data) - (2 * len(answers))].extend(updated_chat_data)
+    
+    return {'status': 'success', 'chatData': chat_data}
+'''
 
 if __name__ == '__main__':
     inital_prompts_filled = 0
