@@ -18,7 +18,7 @@ def get_question(class_name, topic, num_q):
   "engage with me in constructive discussion and exmplain in simple and understandable terms what " + topic +\
   " is in two sentences, and generate " + str(num_q) + " short answer question" + ("s" if num_q > 1 else "") + " to test my understanding."
   tone_prompt = "Use a friendly tone and stimulate my intellectual curiosity."
-  formatting_prompt = '''
+  formatting_prompt = '''\n
   Return the response in the following JSON format (only return JSON and do not put any plain text in the response): 
     {
       "summary": <the summary>,
