@@ -6,10 +6,11 @@ from gpt_client import chatGPT, get_question, get_answer
 import json
 
 
-UPLOAD_FOLDER = './pdf_uploads'
+UPLOAD_FOLDER = '/Users/rohitn/Documents/CalHacksAI2023/pdf_uploads'
 ALLOWED_EXTENSIONS = {'pdf'}
 
 app = Flask(__name__)
+app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 inital_prompts_filled = 0
 user_class = None
 user_topic = None
@@ -98,18 +99,21 @@ def allowed_file(filename):
 
 @app.route('/upload', methods=['GET', 'POST'])
 def upload_file():
+    print("ok")
+    print(request.files)
     if request.method == 'POST':
+        print("test")
         if 'file' not in request.files:
             flash('No file part')
-            return redirect(request.url)
+            return redirect("/")
         file = request.files['file']
         if file.filename == '':
             flash('No selected file')
-            return redirect(request.url)
+            return redirect("/")
         if file and allowed_file(file.filename):
             filename = secure_filename(file.filename)
             file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
-            return redirect(url_for('download_file', name=filename))
+            return redirect("/")
         return '''
     <!doctype html>
     <title>Upload new File</title>
