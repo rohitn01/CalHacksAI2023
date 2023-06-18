@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Chatbot UI</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        $(document).ready(function () {
+            $('form').on('submit', function (event) {
+                event.preventDefault();
+                var user_message = $('#user_message').val();
+                $('#user_message').val('');
+                $('#chat').append('<p class="user">You: ' + user_message + '</p>');
+                $.ajax({
+                    url: '/get_response',
+                    type: 'POST',
+                    data: {user_message: user_message},
+                    success: function (response) {
+                        var bot_response = response['response'];
+                        $('#chat').append('<p class="bot">Bot: ' + bot_response + '</p>');
+                    }
+                });
+            });
+        });
+    </script>
+</head>
+<body>
+    <h1>Chatbot UI</h1>
+    <div id="chat">
+        <!-- Chat messages will be appended here -->
+    </div>
+    <form>
+        <input type="text" id="user_message" placeholder="Enter your message" autofocus>
+        <input type="submit" value="Send">
+    </form>
+</body>
+</html>
