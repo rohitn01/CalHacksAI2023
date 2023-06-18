@@ -16,9 +16,28 @@
                     data: {user_message: user_message},
                     success: function (response) {
                         var bot_response = response['response'];
-                        $('#chat').append('<p class="bot">Bot: ' + bot_response + '</p>');
+                        if(typeof bot_response === "string" && bot_response === "Provide feedback") {
+                            fetch('/update_chat', {
+                                method: 'POST',
+                                headers: {
+                                    'Content-Type': 'application/json'
+                                },
+                                    body: JSON.stringify({ chatData: $('#chat').val() })
+                                })
+                                .then(response => response.json())
+                                .then(result => {
+                                    var updatedChatData = result.chatData;
+                                      $('#chat').val(updatedChatData.join('\n'));
+                                })
+                                .catch(error => {
+                                    console.error('Error:', error);
+                                });
+                        } else {
+                            $('#chat').append('<p class="bot">Bot: ' + bot_response + '</p>');
+                        }
                     }
                 });
+
             });
         });
     </script>

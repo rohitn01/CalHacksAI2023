@@ -18,16 +18,24 @@ gpt_quiz_feedback = None
 def index():
     return render_template('index.html')
 
-'''
+
 @app.route('/update_chat', methods=['POST'])
 def update_chat():
-    chat_data = request.json.get('chatData')  # Assuming the frontend sends JSON data
+    global gpt_quiz_feedback
+    chat_data = request.json.get('chatData')  
+    updated_chat_data = []
+    new_answers = [chat_data[i]  for i in range(len(chat_data) + 1 - (2 * len(answers)), len(chat_data) - 1, 2)]
+    new_questions = [chat_data[i] for i in range(len(chat_data) - (2 * len(questions)), len(chat_data) - 1, 2)]
+    for ques in range(questions):
+        updated_chat_data.append(new_questions[ques])
+        updated_chat_data.append(new_answers[ques])
+        updated_chat_data.append(gpt_quiz_feedback[ques]["rating"])
+        updated_chat_data.append(gpt_quiz_feedback[ques]["explanation"])
+
+    chat_data = chat_data[0:len(chat_data) - (2 * len(answers))].extend(updated_chat_data)
     
-    for i in range(len(chat_data) - 1, len(chat_data) - 1 - len(answers), -1):
-    chat_data.insert(i + 1, )
-    
-    return jsonify({'status': 'success', 'chatData': chat_data})
-'''
+    return {'status': 'success', 'chatData': chat_data}
+
 
 @app.route('/get_response', methods=['POST'])
 def get_response():
@@ -65,13 +73,13 @@ def get_response():
         if(curr_question_response <= len(questions)):
             prompt_response = questions[curr_question_response - 1]
         else:
-            '''
-            Q, R = get_answer(R, answers)
-            response_json = chatGPT(Q + R)
+            gpt_chat = get_answer(R, answers)
+            response_json = chatGPT(gpt_chat)
+            print("afhbjafja", response_json)
             response = json.loads(response_json)
             gpt_quiz_feedback = response["answers"]
-            '''
-            pass
+            #prompt_response = gpt_quiz_feedback
+            prompt_response = "Provide feedback"
 
 
 
