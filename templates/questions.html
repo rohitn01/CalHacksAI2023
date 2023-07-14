@@ -50,11 +50,12 @@
 <body>
   <div class="container">
     <h1>Study Buddy</h1>
-    <form id="questionnaire-form">
-      {% for question in questions %}
+    <form id="questionnaire-form" method="POST" enctype="multipart/form-data" action="{{ url_for('reveal_answers') }}">
+      {% for index, question in questions %}
       <div class="question">
         <label class="question-label">{{ question }}</label>
-        <input class="answer-input" type="text" name="answers[{{ question.id }}]">
+        <input type="hidden" name="question{{ index }}" value="{{ question }}"> 
+        <input class="answer-input" type="text" name="answer{{ index }}">
       </div>
       {% endfor %}
       <button class="submit-btn" type="submit" id="submit-btn" disabled>Review!</button>
@@ -76,34 +77,6 @@
       submitBtn.disabled = !allAnswered;
     }
 
-    function handleSubmit(event) {
-      event.preventDefault(); // Prevent the form from submitting normally
-
-      const formData = new FormData(event.target);
-
-      // Convert the FormData to JSON
-      const json = {};
-      for (const [key, value] of formData) {
-        json[key] = value;
-      }
-      const jsonData = JSON.stringify(json);
-
-      fetch('/generate-reviews', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: jsonData
-      })
-        .then(response => {
-          // Handle the response
-        })
-        .catch(error => {
-          console.error('Error:', error);
-        });
-    }
-
-    submitBtn.addEventListener('click', handleSubmit);
     document.addEventListener('input', validateForm);
   </script>
 </body>

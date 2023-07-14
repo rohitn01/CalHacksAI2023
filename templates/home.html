@@ -63,7 +63,7 @@
 <body>
   <div class="container">
     <h1>Welcome to Study Buddy</h1>
-    <form id="study-form">
+    <form id="study-form" method="POST" enctype="multipart/form-data" action="{{ url_for('questions') }}">
       <label class="upload-label" for="pdf-upload">Upload PDF</label>
       <input class="upload-btn" type="file" id="pdf-upload" name="pdf" accept=".pdf">
       <p class="pdf-name"></p>
@@ -99,41 +99,6 @@
         submitBtn.disabled = true;
       }
     }
-
-        // Assuming you have a function to handle the form submission
-    function handleSubmit(event) {
-        event.preventDefault(); // Prevent the form from submitting normally
-
-        var form = document.getElementById("study-form");
-        var fileInput = document.getElementById("pdf-upload");
-        
-        var topicSelect = document.getElementById("topic-input");
-
-        var file = fileInput.files[0]; // Get the selected file
-        var topic = topicSelect.value; // Get the selected topic
-
-  // Create a FormData object to send the file and other data
-        var formData = new FormData(event.target);
-        formData.append("file", file);
-        formData.append("topic", topic);
-
-        fetch("/generate-questions", {
-            method: "POST",
-            body: formData
-        })
-        .then(response => {
-                console.log("Response:", response)
-
-        })
-        .catch(error => {
-            console.error("Error:", error);
-        });
-    }
-
-        // Add an event listener to the form submit event
-        var form = document.getElementById("study-form");
-        form.addEventListener("submit", handleSubmit);
-
   </script>
 </body>
 </html>
